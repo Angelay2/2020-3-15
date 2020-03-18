@@ -1,7 +1,18 @@
 #include <stdio.h>
-#include <memory.h>
 #include <assert.h>
 #include <Windows.h>
+
+// 进行频繁的插入或删除是不用顺序表的 用链表(效率高)
+// 顺序表:(支持随机访问(一次可以跳到任意位置) 适合尾插,
+// 插入时间复杂度
+// 1. 尾插:时间复杂度为O(1), 不需要移动元素
+// 2. 除过尾插,其他任意(包括头插)位置插入都是O(N), 需要把已经存在的元素向后移动)
+// 需要检查容量, 如果空间已满, 需要增容, 增容代价大
+
+// 删除: (适合尾删 其他性能低)
+// 并不需要释放空间, 只需要覆盖原有位置的值即可
+// 除过尾删的时间复杂度为 O(1), 其他都需要移动元素 所以时间复杂度为O(N)
+// 不需要增容 因为是删除
 
 // 1. 线性表(连续存储)
 // 线性表是n个具有相同特性的数据元素的有限序列. 线性表是一种在实际中广泛使用的数据结构,
@@ -9,7 +20,7 @@
 // 线性表在逻辑上是线性结构, 也就是说是连续的一条直线, 但是在物理结构上并不一定是连续的, 
 // 线性表在物理上存储时, 通常以数组和链式结构的形式存储
 
-// 2. 顺序表(以数组的形式来存放, 一种是定长的(静态顺序表), 一种是不定长的(动态顺序表,)
+// 2. 顺序表(以数组的形式来存放, 一种是定长的(静态顺序表), 一种是不定长的(动态顺序表)
 // 顺序表是用一段物理地址连续的存储单元依次存储数据元素的线性结构,
 // 一般情况采用数组存休, 在数组上完成数据的增删查改
 // 当你在定义顺序表时, 他的大小长度就确定了, 就是定长顺序表, 一般他的元素是放在栈上, (能存储的元素不多)
@@ -46,7 +57,7 @@ void seqInit(seqList* sq){
 	sq->_size = 0;
 }
 
-// 检查容量                                           
+// 检查容量 增容
 void checkCapacity(seqList* sq){
 	if (sq->_size == sq->_capacity){
 		// 顺序表已满, 需要增容, 
@@ -69,7 +80,7 @@ void checkCapacity(seqList* sq){
 		sq->_capacity = newCapacity; 
 	}
 }
-// 增容
+
 
 // 操作接口: 增删查改
 // 插入接口(三个成员: 指针_data, 当前个数_size, 容量_capacity)
@@ -132,10 +143,48 @@ void seqPushBack(seqList* sq, DataType value){
 }
 
 
-// 删除接口
+// 删除接口 访问到的区间只有[0,size-1]
+// 删除并不是去释放空间, 不能把空间还给系统(要还空间也是把整块空间还给系统,不能只把空间的某一位置还给系统), 
+// 顺序表删除不是释放空间, 而是把后面的元素整体向前移动一个位置覆盖要删除的元素, 容量是不变的,--_size
+
+// 任意位置删除(把该位置的数据覆盖即可)
+void seqErase(seqList* sq, size_t position){
+
+	// 断言慎用, 假设现在是空链表删除元素的话, 程序就直接挂掉了,本来没必要挂掉, assert太不友好了
+	// 而且断言只在debug(开发)版本用, 在realease(发行)版本没作用,
+	// 检测给定位置position是否有效
+	// assert(position < sq->_size);// 不能是<= size, sq->_size是访问不到的
+	if (position >= sq->_size)
+		return;
+	// 移动元素 注意元素覆盖问题 ->从前往后移动, 
+	// 当是尾删的话, i = position+1时 就不进循环了,直接--sq->_size,size是最后一个元素的下一个位置
+	for (size_t i = position + 1; i < sq->_size; ++i){
+		sq->_data[i - 1] = sq->_data[i];
+	}
+	--sq->_size;
+}
+
+// 头删
+void popFront(seqList* sq){
+	seqErase(sq, 0);
+}
+
+//尾删
+void popBack(seqList* sq){
+	seqErase(sq, sq->_size - 1);
+}
 
 
-// 查找接口
+
+// 查找接口(无符号查找 返回的都是非负数的位置)
+size_t seqFind(seqList* sq, DataType value){
+	for (size_t i = 0; i < sq->_size; ++i){
+		if (sq->_data[i] == value)
+			return i;
+	}
+
+	return -1; // 如果找不到这个值 返回最大值
+}
 
 // 测试函数
 void test(){
@@ -143,17 +192,47 @@ void test(){
 	seqInit(&sq);
 	seqPushBack(&sq, 0);
 	seqPushBack(&sq, 1);
+	popFront(&sq);
+	printSeqList(&sq);// 删除之后只剩下1了,
 	seqPushBack(&sq, 2);
 	seqPushBack(&sq, 3);
 	seqPushBack(&sq, 4);
-	seqInsert(&sq, 2, 100);
+	popBack(&sq);// 删掉4
+	//seqInsert(&sq, 2, 100);
 	printSeqList(&sq);// 没有头插之前打印一下  打印了0,1,100,2,3,4
 	seqPushFront(&sq, -1);
 	printSeqList(&sq);// 头插之后再打印一下 -1,0,1,100,2,3,4
+	printf("Erase: \n");
+	seqErase(&sq, 3);
+	printSeqList(&sq);
+	seqErase(&sq, 2);
+	printSeqList(&sq);
+	seqErase(&sq, 3);
+	printSeqList(&sq);
+	seqErase(&sq, 0);
+	printSeqList(&sq);
+	seqErase(&sq, 0);
+	printSeqList(&sq);
+	seqErase(&sq, 0);
+	printSeqList(&sq);
+}
+void test2(){
+	seqList sq;
+	seqInit(&sq);
+	seqPushBack(&sq, 0);
+	seqPushBack(&sq, 1);
+	seqPushBack(&sq, 2);
+	seqPushBack(&sq, 3);
+	seqPushBack(&sq, 4);
+	printSeqList(&sq);
+	printf("%u \n", seqFind(&sq, 3));
+	printf("%u \n", seqFind(&sq, 0));
+	printf("%u \n", seqFind(&sq, 100));
 }
 
 int main(){
-	test();
+	//test();
+	test2();
 	system("pause");
 	return 0;
 }
