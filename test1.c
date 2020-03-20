@@ -40,6 +40,7 @@ void printsList(sList* sl){
 		printf("%d ", cur->_data);
 		cur = cur->_next;
 	}
+	printf("\n");
 }
 
 //创建新的结点(进行封装)
@@ -96,12 +97,18 @@ void sListPushBack(sList* sl, int data){
 
 	// 找到最后一个结点
 	Node* cur = sl->_head;
-	// 
+	// 判断是否为空链表
+	if (cur == NULL){
+		sl->_head = createNode(data);
+		return;
+	}
+	// 若不为空链表 就让cur往后走, 直到指向NULL.
 	while (cur->_next){
 		cur = cur->_next;// 向后走一步
 	}
 	// 到这里cur指向了最后一个非空结点
 	cur->_next = createNode(data);
+
 }
 
 // 尾删
@@ -164,6 +171,7 @@ Node* sListFind(sList* sl, int data){
 // 若为尾插, 则node->_next为NULL
 // 给定一个任意(有效)结点(Node* node), 后面插入的数据(int data)
 void sListInsertAfter(Node* node, int data){
+	// 先判断结点是否有效
 	if (node != NULL){
 		Node* next = node->_next;
 		// 创建新结点
@@ -173,19 +181,34 @@ void sListInsertAfter(Node* node, int data){
 	}
 }
 
-//// 任意位置删除
-//void sListEraseAfter(Node* node){
-//	if (node != NULL){
-//		Node* next = node->next;
-//
-//	}
-//
-//}
+// 任意位置删除
+// 先把指定结点->_next保存起来, 将该结点的next指向
+// 时间复杂度为O(1),
+void slisteraseafter(Node* node){
+	if (node != NULL){
+		if (node->_next){
+			// Node* next = node->_next;
+			// node->_next = next->_next;
+			 node->_next = node->_next->_next;
+			// free(next);
+		}
+	}
+}
 
-
-// 单链表销毁
+// 单链表销毁(这些结点都是malloc的, 要还给系统,每个都free掉
+// 如果直接删除头结点, 相当于后面的结点都没有释放掉
+// 先拿到cur的next, 再把cur free掉, 再让cur指向next,逐个free掉,
 void sListDestory(sList* sl){
-
+	if (sl->_head){
+		Node* cur = sl->_head;
+		while (cur){
+			Node* next = cur->_next;
+			free(cur);
+			cur = next;
+		}
+		sl->_head = NULL;// 链表置空
+	}
+	//sl->_head = NULL;
 }
 
 void testsList(){
@@ -201,8 +224,75 @@ void testsList(){
 	sListPopBack(&sl);// 尾删
 	printsList(&sl);// 打印
 }
+void test(){
+	Node* cur;
+	sList sl;
+	sListInit(&sl);
+	sListPushBack(&sl, 1);
+	sListPushBack(&sl, 2);
+	sListPushBack(&sl, 3);
+	sListPushBack(&sl, 4);
+	sListPushBack(&sl, 5);
+	sListPushBack(&sl, 6);
+	printsList(&sl);
+	// 在中间某个结点后面插入数据
+	cur = sListFind(&sl, 4);
+	printf("4 after: 100\n");
+	sListInsertAfter(cur, 100);
+	printsList(&sl);
+	// 在头结点后面插入数据
+	cur = sListFind(&sl, 1);
+	printf("1 after: 200\n");
+	sListInsertAfter(cur, 200);
+	printsList(&sl);
+	// 在最后一个结点后面插入数据
+	cur = sListFind(&sl, 6);
+	printf("6 after: 300\n");
+	sListInsertAfter(cur, 300);
+	printsList(&sl);
+}
+void test1(){
+	Node* cur;
+	sList sl;
+	sListInit(&sl);
+	sListPushBack(&sl, 1);
+	sListPushBack(&sl, 2);
+	sListPushBack(&sl, 3);
+	sListPushBack(&sl, 4);
+	sListPushBack(&sl, 5);
+	sListPushBack(&sl, 6);
+	printsList(&sl);
+	cur = sListFind(&sl, 4);
+	printf("Erase 4 after: \n");
+	slisteraseafter(cur);
+	printsList(&sl);
+
+	cur = sListFind(&sl, 1);
+	printf("Erase 1 after: \n");
+	slisteraseafter(cur);
+	printsList(&sl);
+}
+void test2(){
+	Node* cur;
+	sList sl;
+	sListInit(&sl);
+	sListPushBack(&sl, 1);
+	sListPushBack(&sl, 2);
+	sListPushBack(&sl, 3);
+	sListPushBack(&sl, 4);
+	sListPushBack(&sl, 5);
+	sListPushBack(&sl, 6);
+	printsList(&sl);
+	sListDestory(&sl);
+	printsList(&sl);
+	cur = sListFind(&sl, 4);
+	printsList(&sl);
+}
 int main(){
-	testsList();
+	//testsList();
+	//test();
+	//test1();
+	test2();
 	system("pause");
 	return 0;
 }
