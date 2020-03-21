@@ -1,28 +1,33 @@
 #include <stdio.h>
 #include <windows.h>
 
-// 链表OJ题
-// 单链表他是一个物理上不连续逻辑上连续的一个线性表,
-// 所以在给单链表进行数据的操作时,跟我们的数组(顺序表)是不一样的,
-// 顺序表的插入(除过尾插)一般是O(N)的复杂度,
-// 但是对于单链表来说 要给某一个位置(一般是给某一个元素的后面插入)插入元素是O(1)复杂度 
-// 要是给某一结点的前面插入 就是O(N)的复杂度, 单向非带头不循环的结点插入,应为后面插入
-// 删除的话(删除某一节点后面的结点)是O(1)复杂度, 删除前面是O(N)复杂度
-// 要在单向链表中进行查找是否结点存在是O(N)复杂度,从开始类似遍历找结点知道找到 所以是O(N)
+ //链表OJ题
+ //单链表他是一个物理上不连续逻辑上连续的一个线性表,
+ //所以在给单链表进行数据的操作时,跟我们的数组(顺序表)是不一样的,
+ //顺序表的插入(除过尾插)一般是O(N)的复杂度,
+ //但是对于单链表来说 要给某一个位置(一般是给某一个元素的后面插入)插入元素是O(1)复杂度 
+ //要是给某一结点的前面插入 就是O(N)的复杂度, 单向非带头不循环的结点插入,应为后面插入
+ //删除的话(删除某一节点后面的结点)是O(1)复杂度, 删除前面是O(N)复杂度
+ //要在单向链表中进行查找是否结点存在是O(N)复杂度,从开始类似遍历找结点知道找到 所以是O(N)
 
 // 1. 删除链表中等于给定val的所有结点
 // 输入1->2->6->3->4->5->6, val=6
 // 输出1->2->3->4->5 (->NULL)
-// 把该结点(6)找到删除(释放空间)后, 再把前后结点连接(顺序表删除:覆盖)
-// 从头开始遍历, 拿到链表的头(head) 
+// 把该结点(6)找到删除(释放空间)后, 再把前后结点连接
+// 顺序表的删除是覆盖 链表的删除是释放空间
+// 从头开始遍历找val,删除后 再连接前后结点, 
+// 先拿到链表的头(head) 定义cur指向头结点
 // 涉及三个结点, 一个是前驱(NULL), 一个是当前遍历(1), 一个是next(2)
-// 当前结点不等于6时, 是哪个结点同时向后移动, 直到cur等于6 把6释放掉,
+// 当前结点不等于6时, 结点同时向后移动, 直到cur等于6 把6释放掉,
 // 释放+连接结点
-// 先拿到next = cur->next
-// prev->next = next
-// free(cur)
-// cur = next
-
+// 先保存当前结点cur->_next,                  next = cur->next
+// 再让前驱的prev->next指向cur的原始next,     prev->_next = next
+// 再释放掉cur(删掉)                          free(cur)
+// 再让cur指向下一个元素                      cur = next
+struct ListNode {
+	int val;
+	struct ListNode* next;
+};
 struct ListNode* removeElement(struct ListNode* head, int val){
 	if (head == NULL)
 		return head;// 返回空
@@ -31,10 +36,11 @@ struct ListNode* removeElement(struct ListNode* head, int val){
 	while (cur){// 遍历所有
 		struct ListNode* next = cur->next;
 		if (cur->val == val){// 要删除啦
-			// 释放被删除的结点
-			// 如果释放的为头结点 第一个就是要删除的结点 则更新头结点
+			// 此时已经找到要删除的点了, 则释放要被删除的结点
+			// 如果要释放的为头结点 即第一个就是要删除的结点 则更新头结点
+			// prev = NULL的前提是已经找到等于val的结点,则就是头结点,
 			if (prev == NULL){// cur == head){
-				head = next;
+				head = next;// 更新头结点
 			}
 			else{// 如果删的不是头
 				prev->next = next;
@@ -42,8 +48,8 @@ struct ListNode* removeElement(struct ListNode* head, int val){
 			free(cur);
 			cur = next;
 		}
-		else{// 当不是要删除的结点, 同时更新这个两个结点
-			prev = next;
+		else{// 当不是要删除的结点, 同时更新这两个结点 都向后以移动一个结点
+			prev = cur;
 			cur = next;
 		}
 	}
@@ -51,11 +57,11 @@ struct ListNode* removeElement(struct ListNode* head, int val){
 }
 
 // 反转(逆转)一个单链表
-// 输入: 1, 2, 3, 4, 5, NULL
-// 输出: 5, 4, 3, 2, 1, NULL
+// 输入: 1->2->3->4->5->NULL
+// 输出: 5->4->3->2->1->NULL
 // 1. 头插法 pushFront (
 // 创建一个空链表, 进行头插,
-// 访问1, 让1的next等于NULL, 第二次访问2, 让2的next = 1.... 
+// 第一次访问1, 让1的next等于NULL, 第二次访问2, 让2的next = 1.... 
 // 三个指针: prev=NULL, cur=head, next=next; 
 // 让整个链表向左指, 1的next指向NULL,prev式中指向头,cur指向新的链表的头(prev)
 // next = cur->next;
@@ -256,8 +262,20 @@ struct ListNode* part(struct ListNode* pHead, int x){
 	}
 }
 
+
+// 链表的回文结构
+// 1->2->2->1
+// 1. 一个头指针 一个尾指针 第一个结点和最后一个结点比较 每次都需要遍历很麻烦(O(N2))
+// 2. 不能整体逆转 原来的链表就丢了, 但是可以逆转半个链表
+// 3. 可以先做一个拷贝 再对拷贝的链表逆转 分别比对两个链表的前半部分数据(两个头指针)
+
+if (A == NULL || A->next )
+
+// 找打两个单链表橡胶的起始结点 
+
+// 环形链表
 int main(){
-	
+	removeElement();
 	system("pause");
 	return 0;
 }

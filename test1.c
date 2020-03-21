@@ -1,18 +1,18 @@
 #include <stdio.h>
 #include <windows.h>
 
-// 3. 链表
-// 链表:逻辑上连续 物理上不连续 不是一条线 而是一环扣一环 
-// 每一个数据单元中不光有数据 还有指针 指向下一个元素的起始位置\
-// 一个数据单元包括一个数据和指针, 数据单元不是挨着的, 通过指针连接下一个数据, 都相当于是一个结构体
-// 所以是逻辑连续, 物理不一定连续的线性表
-// 数据单元是结构体(单向) 
-// 8种链表结构
-// 常用的有2种: 
-// 1. 单链表不带头非循环链表( 做底层结构的实现(栈的底层实现) ) 
-// 2. 双链表带头循环结构
-// Node为结点(一个数据单元) sList表示整个单链表(本次实现的为无头非循环单链表)
-
+ /*3. 链表
+ 链表:逻辑上连续 物理上不连续 不是一条线 而是一环扣一环 
+ 每一个数据单元中不光有数据 还有指针 指向下一个元素的起始位置\
+ 一个数据单元包括一个数据和指针, 数据单元不是挨着的, 通过指针连接下一个数据, 都相当于是一个结构体
+ 所以是逻辑连续, 物理不一定连续的线性表
+ 数据单元是结构体(单向) 
+ 8种链表结构
+ 常用的有2种: 
+ 1. 单链表不带头非循环链表( 做底层结构的实现(栈的底层实现) ) 
+ 2. 双链表带头循环结构
+ Node为结点(一个数据单元) sList表示整个单链表(本次实现的为无头非循环单链表)
+*/
 typedef struct Node{// 定义一个结点
 	int _data;// 数据
 	struct Node* _next;// 指向下一个指针
@@ -187,10 +187,9 @@ void sListInsertAfter(Node* node, int data){
 void slisteraseafter(Node* node){
 	if (node != NULL){
 		if (node->_next){
-			// Node* next = node->_next;
-			// node->_next = next->_next;
-			 node->_next = node->_next->_next;
-			// free(next);
+			 Node* next = node->_next;
+			 node->_next = next->_next;
+			 free(next);
 		}
 	}
 }
@@ -208,7 +207,6 @@ void sListDestory(sList* sl){
 		}
 		sl->_head = NULL;// 链表置空
 	}
-	//sl->_head = NULL;
 }
 
 void testsList(){
