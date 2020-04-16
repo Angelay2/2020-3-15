@@ -30,7 +30,7 @@ struct ListNode {
 };
 struct ListNode* removeElement(struct ListNode* head, int val){
 	if (head == NULL)
-		return head;// 返回空
+		return NULL;// 返回空
 	struct ListNode* cur = head;
 	struct ListNode* prev = NULL;
 	while (cur){// 遍历所有
@@ -184,36 +184,46 @@ struct ListNode* (){
 // 判断是否有剩余结点, 若有, 把剩余结点拼接到新的链表的尾部
 // 两个头先比较 小的先走,(若相同, 指定一个先走,然后再比较两个头,重复)
 // 法1: 比较两个头
-struct listNode* mergeTwolists(struct ListNode* l1, struct ListNode* l2){
-	// 特殊情况
+typedef struct ListNode Node;
+struct ListNode* mergeTwoLists(struct ListNode* l1, struct ListNode* l2){
 	if (l1 == NULL)
 		return l2;
-	if (l2 == NULL)
+	else if (l2 == NULL)
 		return l1;
-	struct ListNode* newH, *newT;
-	//确定新的表头
-	if (l1->val < l2->val){
 
-	
+	Node* head = NULL, *tail = NULL;
+	//创建空链表
+	head = tail = (Node*)malloc(sizeof(Node));
+	tail->next = NULL;
+	while (l1 && l2)
+	{
+		// 取小的进行尾插
+		if (l1->val < l2->val)
+		{
+			tail->next = l1;
+			tail = tail->next;
 
+			l1 = l1->next;
+		}
+		else
+		{
+			tail->next = l2;
+			tail = tail->next;
 
-	if (l1->val < l2->val){
-		newT->next = l1;
-		l1 = l1->next;
+			l2 = l2->next;
+		}
 	}
-	else{
-		newT->next = l2;
-		l2 = l2->next;
-	}
-	newT = newT->newt;
-}
-	// 判断是否有剩余结点没有合并
+	//剩余元素直接拼接
 	if (l1)
-		newT->next = l1;
-	if (l2)
-		newT->next = l2;
-	return newT
+		tail->next = l1;
+	else
+		tail->next = l2;
+
+	Node* list = head->next;
+	free(head);
+	return list;
 }
+
 // 法2: 创建带一个头的链表 将所有元素放在后面, 最终返回表头的next
 // 首先创建一个表头
 struct ListNode* {
@@ -223,6 +233,8 @@ struct ListNode* {
 	return l1;
 	struct 
 };
+
+
 // 6. 所有小于x的结点排在大于或等于x的结点之前 返回重新排列的链表的头
 // 10,3,5,6,9,20,4,7,8  所有小于9的排在链表的前半部分, 大于等于9的放在后半部分
 // 保证元素的相对位置不发生变化  val=9
