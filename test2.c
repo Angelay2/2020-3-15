@@ -275,13 +275,50 @@ struct ListNode* part(struct ListNode* pHead, int x){
 }
 
 
-// 链表的回文结构
+// 7. 链表的回文结构
 // 1->2->2->1
-// 1. 一个头指针 一个尾指针 第一个结点和最后一个结点比较 每次都需要遍历很麻烦(O(N2))
-// 2. 不能整体逆转 原来的链表就丢了, 但是可以逆转半个链表
-// 3. 可以先做一个拷贝 再对拷贝的链表逆转 分别比对两个链表的前半部分数据(两个头指针)
+// (1). 一个头指针 一个尾指针 第一个结点和最后一个结点比较 每次都需要遍历很麻烦(O(N2))
+// (2). 不能整体逆转 原来的链表就丢了, 但是可以逆转半个链表
+// (3). 可以先做一个拷贝 再对拷贝的链表逆转 分别比对两个链表的前半部分数据(两个头指针)
+struct ListNode {
+	int val;
+	struct ListNode *next;
+	ListNode(int x) : val(x), next(NULL) {};
+};
+int chkPalindrome(ListNode* A){
 
-if (A == NULL || A->next )
+	if (A == NULL || A->next == NULL)
+		return 1;
+	// 拷贝链表 让新的头和新的尾都指向新开辟的空间
+	struct ListNode* newH, *newT;
+	newH = newT = (struct ListNode*)malloc(sizeof(struct ListNode));
+	newT->val = A->val;
+	newT->next = NULL;
+	// 遍历第一个链表, 
+	struct ListNode* cur = A->next;
+	// 统计链表长度
+	int len = 1;
+	while (cur){
+		struct ListNode* newNode = (struct ListNode*)malloc(sizeof(struct ListNode));
+		newNode->val = cur->val;
+		newNode->next = NULL;
+		// 拷贝
+		newT = newT->next;
+		++len;
+		cur = cur->next;
+	}
+	len /= 2;
+	//比对两个链表的前半部分结点, 如果相等,则为回文结构, 如果不相等, 就是一个非回文结构
+	newT = newH;
+	cur = A;
+	while (len--){
+		if (cur->val != newT->val)
+			return 0;
+		cur = cur->next;
+		newT = newT->next;
+	}
+	return 1;
+}
 
 // 找打两个单链表橡胶的起始结点 
 
