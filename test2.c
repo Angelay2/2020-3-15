@@ -277,9 +277,14 @@ struct ListNode* part(struct ListNode* pHead, int x){
 
 // 7. 链表的回文结构
 // 1->2->2->1
+// 法1:
 // (1). 一个头指针 一个尾指针 第一个结点和最后一个结点比较 每次都需要遍历很麻烦(O(N2))
 // (2). 不能整体逆转 原来的链表就丢了, 但是可以逆转半个链表
 // (3). 可以先做一个拷贝 再对拷贝的链表逆转 分别比对两个链表的前半部分数据(两个头指针)
+
+// 法二:
+// 只逆转链表的后半部分
+// 未逆转的部分和逆转的部分同时遍历, 进行比对, 直到某一个链表值为空, 比对结束 
 struct ListNode {
 	int val;
 	struct ListNode *next;
@@ -307,6 +312,19 @@ int chkPalindrome(ListNode* A){
 		++len;
 		cur = cur->next;
 	}
+
+	// 逆转
+	struct ListNode* prev = NULL;
+	cur = newH;
+	while (cur){
+		// 头插
+		struct ListNode* next = cur->next;
+		cur->next = prev; 
+		prev = cur; 
+		cur = next;
+	}
+	newH = prev;
+
 	len /= 2;
 	//比对两个链表的前半部分结点, 如果相等,则为回文结构, 如果不相等, 就是一个非回文结构
 	newT = newH;
@@ -319,6 +337,7 @@ int chkPalindrome(ListNode* A){
 	}
 	return 1;
 }
+
 
 // 找打两个单链表橡胶的起始结点 
 
