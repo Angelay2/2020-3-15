@@ -334,10 +334,66 @@ int chkPalindrome(ListNode* A){
 			return 0;
 		cur = cur->next;
 		newT = newT->next;
-	}
 	return 1;
 }
 
+int chkPalindrome2(ListNode* A){
+	if (A == NULL || A->next == NULL)
+		return 1;
+	// 局部逆转, 遍历比对
+	// 1. 找到中间结点
+	struct ListNode* fast, *slow; // 快慢指针
+	fast = slow = A; // 都等于头
+	while (fast && fast->next){
+		slow = slow->next;
+		fast = fast->next->next;
+	}
+	// slow: 中间节点, 如果是偶数, 就是第二个中间节点
+	struct ListNode* prev = NULL;
+	struct ListNode* cur = slow;
+	while (cur){
+		struct ListNode* next = cur->next; // 保存cur->next
+		cur->next = prev; // 让cur->next 指向prev
+		prev = cur; // cur变为prev
+		cur = next; // 保存的cur->next变为cur
+	}
+	// 从头开始遍历
+	// prev: 逆转之后的头结点
+	// 让前一半结点和后一般结点开始从头比对 
+	// 如果是偶数 刚好比对的是相同的结点 
+	// 如果是奇数, 逆转比前半部分多一个结点 但是比对的结果都是一样的
+	cur = prev;
+	while (A && cur){
+		if (A->val != cur->val)
+			return 0;
+		A = A->next;  // 因为前半部分的A->next还是指向中间节点的
+		cur = cur->next;
+	}
+}
+// 不建议这样写 
+int chkPalindrome3(ListNode* A){
+	if (A == NULL || A->next == NULL)
+		return 1;
+	// 开一个大数组
+	int* array = (int*)malloc(sizeof(int)* 900);
+	// 遍历链表
+	struct ListNode* cur = A;
+	int count = 0;// 索引
+	while (cur){
+		array[count++] = cur->val;
+		cur = cur->next;
+	}
+	// 判断回文
+	int begin = 0;
+	int end = count - 1;
+	while (begin < end){
+		if (array[begin] != array[end])
+			return 0;
+		++begin;
+		--end;
+	}
+	return 1;
+}
 
 // 找打两个单链表橡胶的起始结点 
 
