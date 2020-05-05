@@ -395,9 +395,81 @@ int chkPalindrome3(ListNode* A){
 	return 1;
 }
 
-// 找打两个单链表橡胶的起始结点 
+// 找打两个单链表相交的起始结点 
+// 从后往前走 在相遇点
+// 1. 首先遍历求出链表长度
+// 2. 让长链表多走两链表节点差的步数, 
+// 3. 然后让两个链表同时走, 
+// 4. 第一个相等的点一定就是相遇点
+// 
+struct ListNode* getIntersectionNode(struct ListNode* headA, struct ListNode* headB){
+	if (headA == NULL || headB == NULL)
+		return NULL;
+	// 统计链表长度
+	struct ListNode* curA = headA;
+	struct ListNode* curB = headB;
+	int lenA, lenB;
+	lenA = lenB = 0;
+	while (curA){
+		++lenA;
+		curA = curA->next;
+	}
+	while (curB){
+		++lenB;
+		curB = curB->next;
+	}
 
-// 环形链表
+	// 求差
+	int diff = abs(lenA - lenB);
+	// 假设链表A比链表B长,
+	curA = headA;
+	curB = headB;
+	if (lenB > lenA){
+		curA = headB;
+		curB = headA;
+	}
+	while (diff--){
+		curA = curA->next;
+	}
+	// 同时走
+	while (curA && curB){
+		// 最好比较指针, 不是去比较值(可能有重复的值)
+		if (curA == curB)
+			return curA;
+		curA = curA->next;
+		curB = curB->next;
+	}
+	return NULL;
+}
+
+// 环形链表 
+// 1. (判断链表中是否有环, 有环的话,链表永远不会到NULL)
+// slow指针: 每次走一步   , 如果快的和慢的相差100步, 那么快的再走100次, 一定能赶上慢指针, 
+// fast指针: 每次走两步     每次比慢指针多走一步,一步一步弥补 防止每次走的步数太多 跳过相遇点
+// 如果fast = slow; 快慢指针相遇了,则有环, 
+// 如果fast每次走两步, 相当于fast每次都可以和slow之间的间距减1. 
+int hasCycle(struct ListNode* head){
+	if (head == NULL)
+		return 0;
+	struct ListNode* fast, *slow;
+	fast = slow = head;
+	while (fast && fast->next){
+		slow = slow->next;
+		fast = fast->next->next;
+		if (slow == fast)
+			return 1;
+	}
+	return 0;
+}
+// 如何求环的长度?
+// 让指针从相遇点继续走, 当再一次走到相遇点时, 所经过的点的个数就是环的长度
+
+// 2. 给定一个链表, 返回链表开始入环的第一个节点, 如果链表无环, 则返回NULL
+// (1). 先判断是否有环, 
+// 
+struct ListNode* deteCycle(struct ListNode* head){
+
+}
 int main(){
 	removeElement();
 	system("pause");
