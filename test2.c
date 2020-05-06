@@ -319,8 +319,8 @@ int chkPalindrome(ListNode* A){
 	while (cur){
 		// 头插
 		struct ListNode* next = cur->next;
-		cur->next = prev; 
-		prev = cur; 
+		cur->next = prev;
+		prev = cur;
 		cur = next;
 	}
 	newH = prev;
@@ -334,7 +334,8 @@ int chkPalindrome(ListNode* A){
 			return 0;
 		cur = cur->next;
 		newT = newT->next;
-	return 1;
+		return 1;
+	}
 }
 
 int chkPalindrome2(ListNode* A){
@@ -395,7 +396,7 @@ int chkPalindrome3(ListNode* A){
 	return 1;
 }
 
-// 找打两个单链表相交的起始结点 
+// 8. 找两个单链表相交的起始结点 
 // 从后往前走 在相遇点
 // 1. 首先遍历求出链表长度
 // 2. 让长链表多走两链表节点差的步数, 
@@ -442,8 +443,8 @@ struct ListNode* getIntersectionNode(struct ListNode* headA, struct ListNode* he
 	return NULL;
 }
 
-// 环形链表 
-// 1. (判断链表中是否有环, 有环的话,链表永远不会到NULL)
+// 9. 环形链表 
+// 9.1 (判断链表中是否有环, 有环的话,链表永远不会到NULL)
 // slow指针: 每次走一步   , 如果快的和慢的相差100步, 那么快的再走100次, 一定能赶上慢指针, 
 // fast指针: 每次走两步     每次比慢指针多走一步,一步一步弥补 防止每次走的步数太多 跳过相遇点
 // 如果fast = slow; 快慢指针相遇了,则有环, 
@@ -464,12 +465,59 @@ int hasCycle(struct ListNode* head){
 // 如何求环的长度?
 // 让指针从相遇点继续走, 当再一次走到相遇点时, 所经过的点的个数就是环的长度
 
-// 2. 给定一个链表, 返回链表开始入环的第一个节点, 如果链表无环, 则返回NULL
+// 9.2 给定一个链表, 返回链表开始入环的第一个节点, 如果链表无环, 则返回NULL
 // (1). 先判断是否有环, 
-// 
-struct ListNode* deteCycle(struct ListNode* head){
+// fast是slow的两倍
+// L:从头结点到入环口的距离
+// C:环的长度
+// X:从入口点到相遇点的距离
+// (2). 分析快指针走过的距离为: L + X + kC (k>=1)   快慢指针相差的距离一定是小于一个环的长度
+// (3). 慢指针走过的距离: L + X. 快指针一定会在一个环的长度内追上慢指针 
+// 最坏的情况是慢指针刚进环, 而快指针就在入口的下一个节点, 
+// 最好情况是慢指针刚进环就和快指针相遇在入口点, 相差1步, 要经过环-1步去弥补(最终两者相遇在入口节点的前一个位置)
+// 2 * (L + X) = L + X + k*C
+// L + X = k*C
+// L = k*C -X (k>=1)
+// L = C - X + (k-1) * C   从相遇点到入口处为C - X 
+// slow从相遇点开始走, cur从头开始走, cur和slow相遇的点就是入口点 --> 最好的情况
 
+
+struct ListNode* hasCycle(struct ListNode* head){
+	if (head == NULL)
+		return NULL;// 如果没有相遇点 返回NULL
+	struct ListNode* fast, *slow;
+	fast = slow = head;
+	while (fast && fast->next){
+		slow = slow->next;
+		fast = fast->next->next;
+		if (slow == fast)
+			return slow;// 如果有相遇点, 返回slow指针
+	}
+	return NULL;
 }
+struct ListNode* deteCycle(struct ListNode* head){
+	struct ListNode* slow = hasCycle(head);
+	if (slow){
+		while (1){
+			if (slow == head)
+				return slow;
+			slow = slow->next;
+			head = head->next;
+		}
+	}
+	// 如果没有环
+	return NULL;
+	
+}
+
+// 10. 复制带随机指针的链表(每个节点带有两指针 next和random
+// 给定一个链表, 每个节点包含一个额外增加的随机指针, 该指针可以指向链表中的任何结点或空节点, 要求返回这个链表的深拷贝
+// 1. 复制 给每个结点复制一个新的结点, 放在该结点的后面, 指向不变, 复制的结点指向复制的下一个结点, 原结点指向原节点的下一个结点  
+// 2. 复制random指针     copy->random = cur->random->next
+// 3. 拆链(把拷贝的链表拆出来) cur->next = copy->next
+
+
+
 int main(){
 	removeElement();
 	system("pause");
