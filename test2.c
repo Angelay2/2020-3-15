@@ -514,7 +514,49 @@ struct ListNode* deteCycle(struct ListNode* head){
 // 给定一个链表, 每个节点包含一个额外增加的随机指针, 该指针可以指向链表中的任何结点或空节点, 要求返回这个链表的深拷贝
 // 1. 复制 给每个结点复制一个新的结点, 放在该结点的后面, 指向不变, 复制的结点指向复制的下一个结点, 原结点指向原节点的下一个结点  
 // 2. 复制random指针     copy->random = cur->random->next
-// 3. 拆链(把拷贝的链表拆出来) cur->next = copy->next
+// 3. 拆链(把拷贝的链表拆出来) cur->next = copy->next, copy->next = cur->next->next
+// 然后再让cur走到cur->next, copy走到copy->next ,copy的链和cur的链
+Node* copyRandomList(Node* head){
+	if (head == NULL)
+		return NULL;
+	// 拷贝节点 三个指针(next, newNode, cur)
+	Node* cur = head;
+	while (cur){
+		Node* next = cur->next;
+		// 创建节点
+		Node* newNode = (Node*)malloc(sizeof(Node));
+		newNode->val = cur->val;
+		// 链接cur, newNode, next
+		newNode->next = next;
+		cur->next = newNode;
+		cur = next;
+	}
+	// 拷贝random
+	cur = head;
+	while (cur){
+		Node* copy = cur->next;
+		if (cur->random)
+			cur->random = cur->random->next;
+		else
+			copy->random = NULL;
+		cur = copy->next;
+	}
+	// 拆链
+	cur = head;
+	Node* newH = cur->next;
+	while (cur){
+		Node* copy = cur->next;
+		Node* next = copy->next;
+
+		cur->next = next;
+		if (next)
+			copy->next = next->next;
+		else
+			copy->next = NULL;
+		cur = next;
+	}
+	return newH;
+}
 
 
 
