@@ -516,6 +516,7 @@ struct ListNode* deteCycle(struct ListNode* head){
 // 2. 复制random指针     copy->random = cur->random->next
 // 3. 拆链(把拷贝的链表拆出来) cur->next = copy->next, copy->next = cur->next->next
 // 然后再让cur走到cur->next, copy走到copy->next ,copy的链和cur的链
+
 Node* copyRandomList(Node* head){
 	if (head == NULL)
 		return NULL;
@@ -557,8 +558,6 @@ Node* copyRandomList(Node* head){
 	}
 	return newH;
 }
-
-
 
 int main(){
 	removeElement();
